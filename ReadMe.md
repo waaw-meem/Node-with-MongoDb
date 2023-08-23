@@ -1,302 +1,115 @@
-<h1>Installing MongoDb</h1>
+<h1>What is Mongoose?</h1>
 
-<p>Just Install the mongodb with this command 
-<code>npm install --save mongodb</code></p>
+<p>Mongoose is an Object Data Modeling (ODM) library for MongoDB and Node.js. MongoDB is a popular NoSQL database, and Mongoose provides a higher-level abstraction and structure for working with MongoDB in Node.js applications. It simplifies the interaction with MongoDB databases and allows developers to define schemas, models, and relationships between data.</p>
 
-<h1>Connect a db with client</h1>
-<p>First thing we should do is actually related to packages of mongodb besides this, we connect with our client as well.
-</p>
-<p><b>Note: Now mostly beginner confused with this code that I uploaded to connect I will give you some example of the code as well</b></p>
-
-<h3>This is the code:</h3>
-
-<code>
-// Importing mongo Packages
-const mongodb = require('mongodb')
-// Connect our client (node application) with mongo packages
-const mongoClient = mongodb.mongoClient;
-
-// function to execute or connect Database with node app
-const mongoConnect = callback => {
-  mongoClient.connect('mongodb+srv://wm401238:Nv7XPCYvD0yA0P83@cluster0.7lptiej.mongodb.net/?retryWrites=true&w=majority')
-.then((client) => {
-  console.log('CONNECTED')
-  callback(client)
-})
-.catch((err) => {
-  console.log(err)
-})
-}
-
-module.exports = mongoConnect
-</code>
-
-<p>Now the first question mostly beginner confused when they see a parameter callback is invoke as a function method So here is the detail with some basic code you can understand it in a very convienent way</p>
-<code>
-// Define a function that takes a callback as a parameter
-function doSomethingAsync(callback) {
-  setTimeout(() => {
-    console.log("Async operation completed");
-    callback(); // Invoke the callback function
-  }, 2000); // Simulate an asynchronous operation that takes 2 seconds
-}
-
-// Define a callback function
-function afterAsyncOperation() {
-  console.log("Callback executed after async operation");
-}
-
-// Call the function and pass the callback
-doSomethingAsync(afterAsyncOperation);
-
-</code>
-<p>
-In this example, we have a function doSomethingAsync that simulates an asynchronous operation using setTimeout. It takes a callback function as a parameter. After the asynchronous operation completes (in this case, after a 2-second delay), it invokes the provided callback function.
+<h1>Connecting to the MongoDB Server with Mongoose</h1>
+<p>Visit mongoosejs.com and install package mongoose like "npm install --save mongoose"
+Second thing import it in app.js file to connect Database
 </p>
 
-<h2>I am providing difference between Async and Sync as well it will help you to all understand it for those who are not familiar</h2>
+<h1>Connecting to the MongoDB Server with Mongoose</h1>
 
-<h5>Synchronous (Sync) Operations:</h5>
-
-<p>
-In synchronous operations, tasks are executed one after another in a sequential manner. Each task must complete before the next one starts. During the execution of a synchronous task, the program will typically block further execution until that task is finished. This can potentially lead to "blocking" behavior where the program waits for a task to complete, which might not be efficient for tasks that take a long time to finish.
+<p>To connect a mongodb using mongoose we use connect method of mongoose with importing in appJS
+file.
 
 <code>
-function syncTask() {
-  console.log("Sync Task 1");
-  console.log("Sync Task 2");
-  console.log("Sync Task 3");
-}
-
-console.log("Start");
-syncTask();
-console.log("End");
-
+mongoose
+  .connect(
+    'mongodb+srv://wm401238:vfhLiyIBo5coUHsR@cluster0.7lptiej.mongodb.net/?retryWrites=true&w=majority'
+  )
+  .then(result => {
+    app.listen(3000);
+  })
+  .catch(err => {
+    console.log(err);
+  });
 </code>
 
-In this example, the output will be:
-
-<code>
-Start
-Sync Task 1
-Sync Task 2
-Sync Task 3
-End
-</code>
 </p>
 
-<h5>Asynchronous</h5>
+<h1>Creating the Product Schema</h1>
 
 <p>
-Asynchronous (Async) Operations:
-In asynchronous operations, tasks can be executed independently, and the program doesn't need to wait for a task to complete before moving on to the next one. Asynchronous operations are commonly used for tasks that might take some time, such as making network requests or reading files. Callbacks, promises, and async/await are mechanisms used to handle asynchronous operations in JavaScript.
-
 <code>
-function asyncTask(callback) {
-  setTimeout(() => {
-    console.log("Async Task 1");
-    callback();
-  }, 2000);
-}
+const mongoose = require('mongoose');
 
-console.log("Start");
-asyncTask(() => {
-  console.log("Async Task 2");
-  console.log("Async Task 3");
+const Schema = mongoose.Schema;
+
+const productSchema = new Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  imageUrl: {
+    type: String,
+    required: true
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
 });
-console.log("End");
 
+module.exports = mongoose.model('Product', productSchema);
 </code>
-
-Start
-End
-Async Task 1
-Async Task 2
-Async Task 3
-
 </p>
 
-<h1>Mongo instructions for doing some CRUD OPS</h1>
-
-<p>
-Firstly we create class and besides this we add some functions according to the need
-
-<code>db.collection('products').updateOne({_id:this._id}, {$set:this})</code>
-This code refer to this.
-
-db.collection('products'): This part of the code specifies the MongoDB collection named 'products'. It's assumed that db is a reference to your MongoDB database instance.
-
-.updateOne({_id:this._id}, {$set:this}): This is the method call that performs the update operation. Here's what each part does:
-
-updateOne: This is the method used to update a single document in the collection.
-
-{_id:this._id}: This is the filter criteria to find the document that you want to update. It's using the _id field to uniquely identify the document. this._id likely refers to the _id value of the current object/document you're working with.
-
-{$set:this}: This is the update operation. In MongoDB, $set is an update operator that sets the values of specific fields in the document. this is likely referring to the current object/document you're working with, which means that you are updating the document with the same values as the current object.
-
-Putting it all together, this line of code is finding a document in the 'products' collection with a specific _id, and then it's updating that document's fields with the values from the current object. In other words, it's updating a single document's fields to match the fields of the current object.
-
-Please note that this is a simplified explanation, and there might be additional context or logic in your application that influences how this code behaves. It's also important to consider error handling and potential edge cases when working with database operations.
-
-
-<code>db.collection('products').insertOne(this)</code>
-
-This code refers to
-
-db.collection('products'): This part of the code specifies the MongoDB collection named 'products'. It's assumed that db is a reference to your MongoDB database instance.
-
-.insertOne(this): This is the method call that performs the insertion operation. Here's what each part does:
-
-insertOne: This is the method used to insert a single document into the collection.
-
-this: In this context, this is likely referring to the current object or data that you want to insert into the collection. The entire current object is being inserted as a new document in the collection.
-
-<code>db.collection('products').find().toArray()</code>
-
-db.collection('products'): This part of the code specifies the MongoDB collection named 'products'. It's assumed that db is a reference to your MongoDB database instance.
-
-.find(): This is the method used to query the collection for documents. Calling .find() with no arguments will retrieve all documents from the collection.
-
-.toArray(): This method is used to convert the result of the query (a cursor) into an array of documents. It returns a Promise that resolves with the array of documents.
-
-.then(products => { ... }): This is the .then() block that handles the successful resolution of the Promise returned by toArray(). The products parameter represents the array of documents retrieved from the collection. Inside this block, the code logs the retrieved products array to the console and then returns the array.
-
-.catch(err => { ... }): This is the .catch() block that handles any errors that might occur during the database operation. If an error occurs, it logs the error to the console.
-
-<code>db.collection('products').find({_id:new mongodb.ObjectId(prodId)}).next()</code>
-
-db.collection('products'): This part of the code specifies the MongoDB collection named 'products'. It's assumed that db is a reference to your MongoDB database instance.
-
-.find({_id:new mongodb.ObjectId(prodId)}): This is the method used to query the collection for documents that match a specific criteria. In this case, you're querying for documents with a _id field that matches the value of new mongodb.ObjectId(prodId). This syntax is typically used to search for documents by their unique _id.
-
-_id: The field name used in the query.
-new mongodb.ObjectId(prodId): This is creating a new MongoDB ObjectId instance based on the value of prodId. The prodId likely represents the unique identifier of the document you're looking for.
-.next(): This method is used to retrieve the next document that matches the query. Since you're querying for a specific document by _id, there should be only one document that matches the query. Calling .next() will retrieve that document.
-
-<code>db.collection('products').deleteOne({_id:new mongodb.ObjectId(prodId)})</code>
-
-db.collection('products'): This part of the code specifies the MongoDB collection named 'products'. It's assumed that db is a reference to your MongoDB database instance.
-
-.deleteOne({_id:new mongodb.ObjectId(prodId)}): This is the method used to delete a single document from the collection that matches a specific criteria. In this case, you're deleting a document with a _id field that matches the value of new mongodb.ObjectId(prodId). This syntax is typically used to delete documents by their unique _id.
-
-_id: The field name used in the query.
-new mongodb.ObjectId(prodId): This is creating a new MongoDB ObjectId instance based on the value of prodId. The prodId likely represents the unique identifier of the document you want to delete.
-</p>
-
-<h1>Updated Cart</h1>
-
-<p>
-Explain this code for the beginners
-<code> const updatedCart = {items:[{...product,quantity:1}]}</code>
-
-Demo Code to understand the above line of code.
+<h2>Understand this code</h2>
 
 <code>
-const updatedCart = {
-  items: [
-    {
-      // ...product is a spread operator that copies properties from the 'product' object
-      // quantity: 1 adds a new property 'quantity' to each item and sets it to 1
-    }
-  ]
-};
-
-// Sample product object
-const product = {
-  id: 1,
-  name: 'Product A',
-  price: 10.99
-};
-
-// Creating an updatedCart object with a single item
-const updatedCart = {
-  items: [
-    {
-      ...product, // Copy properties from the 'product' object
-      quantity: 1 // Add a new property 'quantity' and set it to 1
-    }
-  ]
-};
-
-console.log(updatedCart);
-
-{
-  items: [
-    {
-      id: 1,
-      name: 'Product A',
-      price: 10.99,
-      quantity: 1
-    }
-  ]
-}
-
+cart: {
+    items: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Product',
+          required: true
+        },
+        quantity: { type: Number, required: true }
+      }
+    ]
+  }
 </code>
 
-If we have multiple products then:
+<p>This code is a part of a "cart" feature for an online shopping website. Imagine you're adding items to your shopping cart.
+
+"cart" is like your virtual shopping basket.
+"items" is a list inside the cart where you put the products you want to buy.
+Each "item" in the list has two things:
+"productId": This is a unique ID of the product you want to buy. It's like a special code for that product.
+"quantity": This is the number of that product you want to buy.
+The code is making sure that when you add something to your cart:
+
+It records the product's unique ID and how many you want to buy.
+This setup helps the website remember what you want to buy and how many of each item you've selected.</p>
+
+<h2>More Important features in Mongoose</h2>
+
+<h3>Populate</h3>
+
+<p>
+The populate method is used to retrieve referenced documents from other collections and replace the references with the actual data. This is helpful when you have relationships between documents and you want to fetch related data without making additional queries.
+</p>
 
 <code>
-const product1 = {
-  id: 1,
-  name: 'Product A',
-  price: 10.99
-};
-
-const product2 = {
-  id: 2,
-  name: 'Product B',
-  price: 19.99
-};
-
-const product3 = {
-  id: 3,
-  name: 'Product C',
-  price: 5.49
-};
-
-const updatedCart = {
-  items: [
-    {
-      ...product1,
-      quantity: 1
-    },
-    {
-      ...product2,
-      quantity: 1
-    },
-    {
-      ...product3,
-      quantity: 1
-    }
-  ]
-};
-
-console.log(updatedCart);
-
-{
-  items: [
-    {
-      id: 1,
-      name: 'Product A',
-      price: 10.99,
-      quantity: 1
-    },
-    {
-      id: 2,
-      name: 'Product B',
-      price: 19.99,
-      quantity: 1
-    },
-    {
-      id: 3,
-      name: 'Product C',
-      price: 5.49,
-      quantity: 1
-    }
-  ]
-}
-
-
-
+ .populate('userId', 'name')
 </code>
+
+<h3>Select</h3>
+
+<p>
+The select method is used to specify which fields you want to include or exclude when querying the database. It helps in retrieving only the necessary data and improving performance.
 </p>
+
+<code>
+.select('title price -_id')
+</code>
